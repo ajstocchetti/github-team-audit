@@ -136,6 +136,7 @@ function cleanRepoData(repo) {
   };
   if (!repo.private) ret.public = true;
   if (repo.owner.login != 'ServerCentral') ret.owner = repo.owner.login;
+  if (repo.archived) ret.archived = repo.archived;
   return ret;
 }
 
