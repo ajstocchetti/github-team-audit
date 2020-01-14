@@ -1,5 +1,7 @@
 require('dotenv').config();
 const superagent = require('superagent');
+const {Parser} = require('json2csv');
+
 const authHeader = `token ${process.env.GITHUBOAUTHKEY}`;
 const userAgent = `$process.env.GH_USER/servercentral`;
 const orgName = process.env.ORG || 'servercentral';
@@ -122,9 +124,10 @@ async function getReposNoTeam(org) {
     });
   }
 
-  const noTeams = repos.filter(r => r.teams.length === 0).map(cleanRepoData);
-  console.log('Repos not assigned to a team:');
-  console.log(noTeams);
+  const noTeams = repos.filter(r => r.teams.length === 0);
+  // console.log('Repos not assigned to a team:');
+  // console.log(noTeams.map(cleanRepoData));
+  writeCsv(repos);
 }
 
 function cleanRepoData(repo) {
@@ -138,6 +141,23 @@ function cleanRepoData(repo) {
   if (repo.owner.login != 'ServerCentral') ret.owner = repo.owner.login;
   if (repo.archived) ret.archived = repo.archived;
   return ret;
+}
+
+function generateRepoCsv(csvData) {
+  const parser = new Parser({fields: [
+    {label: 'Repository', value: 'name'},
+    {label: 'Repo ID', value: 'id'},
+    {label: 'Organization', value: 'owner.login'},
+    {label: 'Private', value: 'private'},
+    {label: 'Archived', value: 'archived'},
+    {label: 'Teams', value: x => x.teams.join(', ')},
+  ]});
+  return parser.parse(csvData);
+}
+
+function writeCsv(repos) {
+  const data = generateRepoCsv(repos);
+  require('fs').writeFileSync(`Github Repos - ${new Date().toISOString()}`, data);
 }
 
 
