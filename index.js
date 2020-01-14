@@ -122,10 +122,21 @@ async function getReposNoTeam(org) {
     });
   }
 
-  const noTeams = repos.filter(r => r.teams.length === 0).map(r => ({
-    name: r.name, id: r.id, full_name: r.full_name}));
+  const noTeams = repos.filter(r => r.teams.length === 0).map(cleanRepoData);
   console.log('Repos not assigned to a team:');
   console.log(noTeams);
+}
+
+function cleanRepoData(repo) {
+  const ret = {
+    name: repo.name,
+    id: repo.id,
+    // private: repo.private,
+    // org: repo.owner.login,
+  };
+  if (!repo.private) ret.public = true;
+  if (repo.owner.login != 'ServerCentral') ret.owner = repo.owner.login;
+  return ret;
 }
 
 
