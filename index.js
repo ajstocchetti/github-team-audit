@@ -2,12 +2,7 @@ require('dotenv').config();
 const superagent = require('superagent');
 const authHeader = `token ${process.env.GITHUBOAUTHKEY}`;
 const userAgent = `$process.env.GH_USER/servercentral`;
-// get users for org
-// get teams for org
-// get repos for org
-
-// get users not in team
-// get repos not in team
+const orgName = process.env.ORG || 'servercentral';
 
 
 function prepGhReq(url) {
@@ -43,9 +38,9 @@ function cleanLink(link) {
 const simplify = arr => arr.map(x => ({name: x.name, id: x.id}));
 
 
-async function getUsersForOrg(orgId) {
+async function getUsersForOrg(org) {
   try {
-    return await getData(`https://api.github.com/orgs/${orgId}/members?per_page=100`);
+    return await getData(`https://api.github.com/orgs/${org}/members?per_page=100`);
   } catch (err) {
     console.error(err);
   }
@@ -55,17 +50,17 @@ function usersToList(usersResponse) {
   return usersResponse.map(b => ({login: b.login, id: b.id, teams: []}));
 }
 
-async function getTeamsForOrg(orgId) {
+async function getTeamsForOrg(org) {
   try {
-    return getData(`https://api.github.com/orgs/${orgId}/teams?per_page=100`);
+    return getData(`https://api.github.com/orgs/${org}/teams?per_page=100`);
   } catch (err) {
     console.error(err);
   }
 }
 
-async function getReposForOrg(orgId) {
+async function getReposForOrg(org) {
   try {
-    return await getData(`https://api.github.com/orgs/${orgId}/repos?per_page=100`)
+    return await getData(`https://api.github.com/orgs/${org}/repos?per_page=100`)
   } catch (err) {
     console.error(err);
   }
@@ -134,5 +129,5 @@ async function getReposNoTeam(org) {
 }
 
 
-getUsersNoTeam('servercentral');
-getReposNoTeam('servercentral');
+getUsersNoTeam(orgName);
+getReposNoTeam(orgName);
