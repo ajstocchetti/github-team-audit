@@ -6,6 +6,16 @@ const authHeader = `token ${process.env.GITHUBOAUTHKEY}`;
 const userAgent = `$process.env.GH_USER/servercentral`;
 const orgName = process.env.ORG || 'servercentral';
 
+module.exports = {
+  getUsersForOrg,
+  getTeamsForOrg,
+  getReposForOrg,
+  getReposForTeam,
+  getUsersForTeam,
+  getUsersNoTeam,
+  getReposNoTeam,
+};
+
 
 function prepGhReq(url) {
   return superagent.get(url)
@@ -38,7 +48,6 @@ function cleanLink(link) {
 }
 
 const simplify = arr => arr.map(x => ({name: x.name, id: x.id}));
-
 
 async function getUsersForOrg(org) {
   try {
@@ -147,7 +156,7 @@ function generateRepoCsv(csvData) {
   const parser = new Parser({fields: [
     {label: 'Repository', value: 'name'},
     {label: 'Repo ID', value: 'id'},
-    {label: 'Organization', value: 'owner.login'},
+    // {label: 'Organization', value: 'owner.login'},
     {label: 'Private', value: 'private'},
     {label: 'Archived', value: 'archived'},
     {label: 'Teams', value: x => x.teams.join(', ')},
@@ -159,7 +168,3 @@ function writeCsv(repos) {
   const data = generateRepoCsv(repos);
   require('fs').writeFileSync(`Github Repos - ${new Date().toISOString()}`, data);
 }
-
-
-getUsersNoTeam(orgName);
-getReposNoTeam(orgName);
