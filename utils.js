@@ -3,8 +3,8 @@ const superagent = require('superagent');
 const {Parser} = require('json2csv');
 
 const authHeader = `token ${process.env.GITHUBOAUTHKEY}`;
-const userAgent = `${process.env.GH_USER}/servercentral`;
 const orgName = process.env.ORG || 'servercentral';
+const userAgent = `${process.env.GH_USER}/${orgName}`;
 
 module.exports = {
   orgName,
@@ -102,6 +102,8 @@ async function getUsersNoTeam(org) {
   const users = usersToList(uAll);
   const teams = simplify(tAll);
 
+  // Yes, i know that the runtime for this is horrible [O(mxn)]
+  // but the numbers are small enough that it isnt worth optimizing
   for (let x = 0; x < teams.length; x++) {
     const team = teams[x];
     const tusers = await getUsersForTeam(team.id);
@@ -167,5 +169,5 @@ function generateRepoCsv(csvData) {
 
 function writeCsv(repos) {
   const data = generateRepoCsv(repos);
-  require('fs').writeFileSync(`Github Repos - ${new Date().toISOString()}`, data);
+  require('fs').writeFileSync(`Github Repos - ${new Date().toISOString()}.csv`, data);
 }
