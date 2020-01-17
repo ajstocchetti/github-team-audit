@@ -1,0 +1,1 @@
+Utility to identify repositories and users that are not assigned to a team for an organization. This is to assist some clean up work so we can implement more restrictive organization access policies, and move over to team-based access.
